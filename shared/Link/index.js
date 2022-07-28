@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Link as Root } from '@mui/material'
+import Root from '@mui/material/Link'
 import PropTypes from 'prop-types'
 
 function Link({ to, text, color, children, ...rest }) {

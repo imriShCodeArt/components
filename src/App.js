@@ -1,15 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import Divider from '@mui/material/Divider'
-
-import Link from 'components/Link'
-import Avatar from 'components/Avatar'
-
 import './index.css'
-import { BrowserRouter } from 'react-router-dom'
-import { Grid, Paper } from '@mui/material'
-import Theme from './Theme'
+import { BrowserRouter, useNavigate } from 'react-router-dom'
+import Menu from '../shared/Menu'
+import { Dashboard, Info, Logout, Settings } from '@mui/icons-material/'
+import Avatar from '../shared/Avatar'
+import { Stack } from '@mui/material'
 
 // const MyTheme = React.lazy(() => import('theme/Theme'))
 // const Theme = ({ children, ...rest }) => (
@@ -20,20 +17,60 @@ import Theme from './Theme'
 //   </React.Suspense>
 // )
 
-const App = () => (
-  <BrowserRouter>
-    <Theme state={{}}>
-      <Avatar>
-        <Link text={'Account'} to={'account'} />
-        <Link text={'Preferences'} to={'preferences'} />
-        <Link text={'Settings'} to={'settings'} />
-        <Divider variant='middle' />
-        <Link text={'Profile'} to={'profile'} />
-        <Link text={'Logout'} to={'logout'} />
-      </Avatar>
-    </Theme>
-  </BrowserRouter>
-)
+const App = () => {
+  const navigation = useNavigate()
+  const items = [
+    {
+      text: 'Profile',
+      action: () => navigation('settings/profile'),
+      icon: <Dashboard />,
+    },
+    {
+      text: 'Account',
+      action: () => navigation('settings/Account'),
+      icon: <Info />,
+    },
+    {
+      text: 'Settings',
+      action: () => navigation('settings'),
+      icon: <Settings />,
+    },
+    {
+      text: 'divider',
+    },
+    {
+      text: 'Log Out',
+      action: () => navigation('logout'),
+      icon: <Logout />,
+    },
+  ]
+  return (
+    <>
+      <Menu anchorText={'Click'} items={items} />
+      {['xs', 'sm', 'md', 'lg', 'xl', 'xxl'].map((i, index) => (
+        <Stack key={index} direction={'row'}>
+          <Avatar
+            size={i}
+            imgSrc={
+              'https://miro.medium.com/fit/c/176/176/1*bj4j4IqF5ov3jeha_2tRkQ.jpeg'
+            }
+            items={items}
+          />
+          <Avatar
+            key={index}
+            size={i}
+            text={'T'}
+            items={items}
+          />
+        </Stack>
+      ))}
+    </>
+  )
+}
 
 const root = ReactDOM.createRoot(document.getElementById('app'))
-root.render(<App />)
+root.render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+)

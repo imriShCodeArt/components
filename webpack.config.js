@@ -6,7 +6,6 @@ module.exports = {
   output: {
     publicPath: 'http://localhost:4010/',
   },
-
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
     alias: {
@@ -49,7 +48,7 @@ module.exports = {
       },
     ],
   },
-
+  devtool : 'inline-source-map',
   plugins: [
     new ModuleFederationPlugin({
       name: 'components',
