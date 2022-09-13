@@ -19,9 +19,8 @@ Heading.propTypes = {
 };
 
 Heading.defaultProps = {
-  text: "Heading",
+  text: "",
   variant: "h1",
-  color: "primary",
 };
 
 export default Heading;
