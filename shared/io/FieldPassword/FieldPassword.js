@@ -10,22 +10,13 @@ import loadable from "@loadable/component";
 const ToggleButton = loadable(() => import("@mui/material/ToggleButton"));
 const ToggleButtonGroup = loadable(() => import("@mui/material/ToggleButtonGroup"));
 const Visibility = loadable(() => import("@mui/icons-material/Visibility"));
-const VisibilityOff = loadable(() => import("@mui/icons-material/VisibilityOff"));
-const CircularProgressBar = loadable(() =>
-  import("../../feedback/ProgressBar/CircularProgressBar")
-);
-
-// ****************************************************
-// SHOULD FIX FUNCTIONS BEHAVIOR
-// ****************************************************
+const VisibilityOff = loadable(() => import("@mui/icons-material/VisibilityOffOutlined"));
 
 const FieldPassword = ({
-  functions,
   label,
   name,
   placeholder,
   borderColor,
-  showPasswordDuration,
   disableShowPassword,
   sx,
   minLength,
@@ -40,14 +31,14 @@ const FieldPassword = ({
   const btnRef = createRef();
   const inputRef = createRef();
 
-//   const { onChange, onBlur, onFocus, ...rest } = functions || {};
-
   const [value, setValue] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [stepsCount, setStepsCount] = useState(0); //  This is an helper for visualizing countdown after clicking on 'show password' button
   const [hideShowPassword, setHideShowPassword] = useState(false);
-  const [passwordStrengthScore, setPasswordStrengthScore] = useState();
+
   const [conditions, setConditions] = useState({
+    score: isStrongPassword(value, {
+      returnScore: (s) => s,
+    }),
     minLength: false,
     minLowercase: false,
     minNumbers: false,
@@ -55,44 +46,26 @@ const FieldPassword = ({
     minUppercase: false,
   });
 
+  useEffect(() => {
+    setConditions({
+      score: isStrongPassword(value, {
+        returnScore: (s) => s,
+      }),
+      minLength: formatConditions("minLength", minLength),
+      minLowercase: formatConditions("minLowercase", minLowercase),
+      minNumbers: formatConditions("minNumbers", minNumbers),
+      minSymbols: formatConditions("minSymbols", minSymbols),
+      minUppercase: formatConditions("minUppercase", minUppercase),
+    });
+  }, [value]);
+
   const handleChange = (e) => {
     setValue(e.target.value);
   };
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const startCounting = (intervalLength = 2000) => {
-    const interval = setInterval(() => {
-      setStepsCount((oldVal) => (oldVal > 1 ? oldVal - 1 : stop()));
-    }, Math.floor(intervalLength / 100));
-
-    function stop() {
-      setTimeout(() => {
-        clearInterval(interval);
-        setShowPassword(false);
-        setStepsCount(0);
-      }, 500);
-      return 1;
-    }
-  };
-
-  function handleBlur(e) {
-    setHideShowPassword(true);
-    onBlur && onBlur({ e, value, passwordStrengthScore, conditions });
-  }
   function handleFocus(e) {
     setHideShowPassword(false);
-    onFocus && onFocus({ e, value, passwordStrengthScore, conditions });
   }
-
-  useEffect(() => {
-    if (showPassword && showPasswordDuration) {
-      setStepsCount(100);
-      startCounting(showPasswordDuration);
-    }
-  }, [showPassword]);
 
   function formatConditions(key, fieldValue) {
     let tmp = {};
@@ -104,42 +77,36 @@ const FieldPassword = ({
     return isStrongPassword(value, tmp);
   }
 
-  useEffect(() => {
-    setPasswordStrengthScore(
-      isStrongPassword(value, {
-        returnScore: (s) => s,
-      })
-    );
-    setConditions({
-      minLength: formatConditions("minLength", minLength),
-      minLowercase: formatConditions(minLowercase),
-      minNumbers: formatConditions(minNumbers),
-      minSymbols: formatConditions(minSymbols),
-      minUppercase: formatConditions(minUppercase),
-    });
-  }, [value]);
-  useEffect(() => {
-    console.log(onChange);
-    onChange && onChange({ value, score: passwordStrengthScore, conditions });
-  }, [conditions]);
-
   return (
     <Box display={"flex"} pt={".2em"}>
       <TextField
-        ref={inputRef}
+        inputProps={{
+          ref: inputRef,
+        }}
         sx={(theme) => ({
           "& fieldset": { borderColor: borderColor && theme.palette[borderColor].main },
           flexGrow: 1,
+          ...sx,
         })}
         {...{
           label,
           name,
           placeholder,
-          ...functions,
-          onChange: handleChange,
-          onFocus: handleFocus,
-          onBlur: (e) =>
-            e.relatedTarget === btnRef.current ? {} : setHideShowPassword(true),
+          onChange: (e) => {
+            handleChange(e);
+            onChange && onChange({ e, value, conditions });
+          },
+          onFocus: (e) => {
+            handleFocus(e);
+            onFocus && onFocus(e, value, conditions);
+          },
+          onBlur: (e) => {
+            if (e.relatedTarget !== btnRef.current) {
+              setHideShowPassword(true);
+              setShowPassword(false);
+            }
+            onBlur && onBlur({ e, value, conditions });
+          },
         }}
         type={showPassword ? "text" : "password"}
       />
@@ -149,28 +116,18 @@ const FieldPassword = ({
             ref={btnRef}
             size='small'
             value={showPassword}
-            onClick={() =>
-              !showPasswordDuration
-                ? toggleShowPassword()
-                : !showPassword && toggleShowPassword()
-            }
-            onFocus={handleFocus}
-            onBlur={(e) =>
-              e.relatedTarget === inputRef.current
-                ? setHideShowPassword(true)
-                : toggleShowPassword()
-            }
+            onClick={() => {
+              setShowPassword(!showPassword);
+            }}
+            onFocus={(e) => handleFocus(e)}
+            onBlur={(e) => {
+              if (e.relatedTarget !== inputRef.current) {
+                setHideShowPassword(true);
+                setShowPassword(false);
+              }
+            }}
           >
             {showPassword ? <VisibilityOff /> : <Visibility />}
-            {stepsCount > 0 && (
-              <CircularProgressBar
-                sx={{ color: "#aaa", ...sx }}
-                value={stepsCount}
-                size={31}
-                top={"21%"}
-                left={"10%"}
-              />
-            )}
           </ToggleButton>
         </ToggleButtonGroup>
       )}
@@ -179,11 +136,9 @@ const FieldPassword = ({
 };
 
 FieldPassword.propTypes = {
-  functions: PropTypes.shape({
-    onChange: PropTypes.func,
-    onBlur: PropTypes.func,
-    onFocus: PropTypes.func,
-  }),
+  onChange: PropTypes.func,
+  onBlur: PropTypes.func,
+  onFocus: PropTypes.func,
   label: PropTypes.string,
   name: PropTypes.string,
   placeholder: PropTypes.string,
@@ -195,7 +150,6 @@ FieldPassword.propTypes = {
     "success",
     "success",
   ]),
-  showPasswordDuration: PropTypes.number,
   disableShowPassword: PropTypes.bool,
   sx: PropTypes.object,
   minLength: PropTypes.number,
