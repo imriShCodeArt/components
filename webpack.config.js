@@ -73,6 +73,8 @@ module.exports = {
         "./io/Checkbox": "./shared/io/Checkbox",
         "./io/Fab": "./shared/io/Fab",
         "./io/Field": "./shared/io/Field",
+		"./io/FieldEmail": "./shared/io/FieldEmail",
+		"./io/FieldPassword": "./shared/io/FieldPassword",
         "./io/AutoComplete": "./shared/io/FieldDate",
         "./io/IconButton": "./shared/io/IconButton",
         "./io/Radio": "./shared/io/Radio",
