@@ -11,6 +11,7 @@ const ToggleButton = loadable(() => import("@mui/material/ToggleButton"));
 const ToggleButtonGroup = loadable(() => import("@mui/material/ToggleButtonGroup"));
 const Visibility = loadable(() => import("@mui/icons-material/Visibility"));
 const VisibilityOff = loadable(() => import("@mui/icons-material/VisibilityOffOutlined"));
+const Alert = loadable(() => import("../../feedback/Alert"));
 
 const FieldPassword = ({
   label,
@@ -27,7 +28,19 @@ const FieldPassword = ({
   onChange,
   onBlur,
   onFocus,
+  showAlerts,
+  messeges,
 }) => {
+  const {
+    score: scoreMsg,
+    minLength: lengthMsg,
+    minLowercase: lowerMsg,
+    minUppercase: upperMsg,
+    minNumbers: numbersMsg,
+    minSymbols: symbolsMsg,
+    alertTitle,
+  } = messeges || {};
+
   const btnRef = createRef();
   const inputRef = createRef();
 
@@ -59,6 +72,11 @@ const FieldPassword = ({
     });
   }, [value]);
 
+  useEffect(() => {
+    // console.log(conditions);
+    onChange && onChange({ value, conditions });
+  }, [conditions]);
+
   const handleChange = (e) => {
     setValue(e.target.value);
   };
@@ -78,60 +96,75 @@ const FieldPassword = ({
   }
 
   return (
-    <Box display={"flex"} pt={".2em"}>
-      <TextField
-        inputProps={{
-          ref: inputRef,
-        }}
-        sx={(theme) => ({
-          "& fieldset": { borderColor: borderColor && theme.palette[borderColor].main },
-          flexGrow: 1,
-          ...sx,
-        })}
-        {...{
-          label,
-          name,
-          placeholder,
-          onChange: (e) => {
-            handleChange(e);
-            onChange && onChange({ e, value, conditions });
-          },
-          onFocus: (e) => {
-            handleFocus(e);
-            onFocus && onFocus(e, value, conditions);
-          },
-          onBlur: (e) => {
-            if (e.relatedTarget !== btnRef.current) {
-              setHideShowPassword(true);
-              setShowPassword(false);
-            }
-            onBlur && onBlur({ e, value, conditions });
-          },
-        }}
-        type={showPassword ? "text" : "password"}
-      />
-      {!hideShowPassword && value.length > 0 && !disableShowPassword && (
-        <ToggleButtonGroup size='small' value={true}>
-          <ToggleButton
-            ref={btnRef}
-            size='small'
-            value={showPassword}
-            onClick={() => {
-              setShowPassword(!showPassword);
-            }}
-            onFocus={(e) => handleFocus(e)}
-            onBlur={(e) => {
-              if (e.relatedTarget !== inputRef.current) {
+    <>
+      <Box pt={".2em"}>
+        <TextField
+          inputProps={{
+            ref: inputRef,
+          }}
+          sx={(theme) => ({
+            "& fieldset": { borderColor: borderColor && theme.palette[borderColor].main },
+            width: '100%',
+            ...sx,
+          })}
+          {...{
+            label,
+            name,
+            placeholder,
+            onChange: (e) => {
+              handleChange(e);
+            },
+            onFocus: (e) => {
+              handleFocus(e);
+              onFocus && onFocus(e, value, conditions);
+            },
+            onBlur: (e) => {
+              if (e.relatedTarget !== btnRef.current) {
                 setHideShowPassword(true);
                 setShowPassword(false);
               }
-            }}
-          >
-            {showPassword ? <VisibilityOff /> : <Visibility />}
-          </ToggleButton>
-        </ToggleButtonGroup>
+              onBlur && onBlur({ e, value, conditions });
+            },
+          }}
+          type={showPassword ? "text" : "password"}
+        />
+        {!hideShowPassword && value.length > 0 && !disableShowPassword && (
+          <ToggleButtonGroup size='small' value={true}>
+            <ToggleButton
+              ref={btnRef}
+              size='small'
+              value={showPassword}
+              onClick={() => {
+                setShowPassword(!showPassword);
+              }}
+              onFocus={(e) => handleFocus(e)}
+              onBlur={(e) => {
+                if (e.relatedTarget !== inputRef.current) {
+                  setHideShowPassword(true);
+                  setShowPassword(false);
+                }
+              }}
+            >
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </ToggleButton>
+          </ToggleButtonGroup>
+        )}
+      </Box>
+      {showAlerts && (
+        <Alert severity={'warning'}
+          title={alertTitle}
+          messege={
+            <ul>
+              {messeges
+                ? Object.keys(messeges).map(
+                    (m) => m !== "alertTitle" && <li key={m} >{messeges[m]}</li>
+                  )
+                : ""}
+            </ul>
+          }
+        />
       )}
-    </Box>
+    </>
   );
 };
 
