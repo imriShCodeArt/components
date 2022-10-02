@@ -2,6 +2,7 @@ import React from 'react'
 import { hot } from "react-hot-loader/root";
 import Box from '@mui/material/Box'
 import Heading from '../shared/data_display/Heading'
+import H1 from '../shared/data_display/Heading/H1';
 //  ******* clears console after each code update ******
 window.addEventListener("message", function onWebpackMessage(e) {
   console.clear();
@@ -12,7 +13,7 @@ const App = () => {
 
   return (
     <Box>
-      <Heading text={'Heading'} />
+      <H1 color={'primary'} text={'Heading'} />
     </Box>
   )
 }
