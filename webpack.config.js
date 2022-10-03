@@ -4,7 +4,7 @@ const path = require("path");
 const deps = require("./package.json").dependencies;
 module.exports = {
   output: {
-    publicPath: "http://localhost:4010/",
+    publicPath: "http://localhost:4001/",
   },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
@@ -14,7 +14,7 @@ module.exports = {
   },
 
   devServer: {
-    port: 4010,
+    port: 4001,
     historyApiFallback: true,
   },
 
@@ -59,6 +59,8 @@ module.exports = {
         "./data/Chip": "./shared/data_display/Chip",
         "./data/Divider": "./shared/data_display/Divider",
         "./data/Heading": "./shared/data_display/Heading",
+        "./data/H1": "./shared/data_display/Heading/H1",
+        "./data/H2": "./shared/data_display/Heading/H2",
         "./data/List": "./shared/data_display/List",
         "./data/ListItem": "./shared/data_display/ListItem",
         "./data/Table": "./shared/data_display/Table",
@@ -72,9 +74,9 @@ module.exports = {
         "./io/ButtonGroup": "./shared/io/ButtonGroup",
         "./io/Checkbox": "./shared/io/Checkbox",
         "./io/Fab": "./shared/io/Fab",
-        "./io/Field": "./shared/io/Field",
-		"./io/FieldEmail": "./shared/io/FieldEmail",
-		"./io/FieldPassword": "./shared/io/FieldPassword",
+        "./io/FieldEmail": "./shared/io/FieldEmail",
+        "./io/FormField": "./shared/io/FormField",
+        "./io/FieldPassword": "./shared/io/FieldPassword",
         "./io/AutoComplete": "./shared/io/FieldDate",
         "./io/IconButton": "./shared/io/IconButton",
         "./io/Radio": "./shared/io/Radio",
@@ -97,6 +99,7 @@ module.exports = {
         "./surfaces/AppBar": "./shared/surfaces/AppBar",
         "./surfaces/Card": "./shared/surfaces/Card",
         "./surfaces/Collapse": "./shared/surfaces/Collapse",
+        "./providers/Form": "./shared/providers/Form",
       },
       shared: {
         ...deps,
