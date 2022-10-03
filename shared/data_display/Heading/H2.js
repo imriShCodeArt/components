@@ -3,10 +3,8 @@ import PropTypes from "prop-types";
 
 import Typography from "@mui/material/Typography";
 
-const H2 = ({ contextHook, ...props }) => {
-  const context = typeof contextHook === "function" && contextHook().title;
-  const { children, text, color, size, variant, ariaLabel, ...rest } =
-    context || props || {};
+const H2 = ({ ...props }) => {
+  const { children, text, color, size, variant, ariaLabel, ...rest } = props || {};
   return (
     <Typography
       color={"primary"}
