@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import Root from "@mui/material/Button";
+import { useFormContext } from "shared/providers/Form";
 
 function Button({
   color,
@@ -23,6 +24,8 @@ function Button({
   success,
   ...rest
 }) {
+  const context = useFormContext();
+  const { onSubmit } = context;
   return (
     <Root
       aria-controls={controls}
@@ -44,7 +47,8 @@ function Button({
           ? "success"
           : color
       }
-      {...{ onClick, id, title, ...rest }}
+      {...{ id, title, ...rest }}
+      onClick={onSubmit || onClick}
     >
       {children || text}
     </Root>
