@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import isEmail from "validator/lib/isEmail";
+import isStrongPassword from "validator/lib/isStrongPassword";
 
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
@@ -9,9 +9,13 @@ import Box from "@mui/material/Box";
 import loadable from "@loadable/component";
 import { useFormContext } from "../../providers/Form";
 
+const ToggleButton = loadable(() => import("@mui/material/ToggleButton"));
+const ToggleButtonGroup = loadable(() => import("@mui/material/ToggleButtonGroup"));
+const Visibility = loadable(() => import("@mui/icons-material/Visibility"));
+const VisibilityOff = loadable(() => import("@mui/icons-material/VisibilityOffOutlined"));
 const Alert = loadable(() => import("../../feedback/Alert"));
 
-const FieldEmail = ({
+const FieldPassword2 = ({
   functions,
   label,
   name,
@@ -20,12 +24,13 @@ const FieldEmail = ({
   defaultValue,
   sx,
   messeges,
+  displayAlerts,
   BoxProps,
   AlertProps,
   ...rest
 }) => {
   const context = useFormContext();
-  const { reportChange, displayAlerts } = context;
+  const { reportChange } = context;
   const [value, setValue] = useState(defaultValue);
   const [alertsToDisplay, setAlertsToDisplay] = useState(<></>);
   const { onChange, onBlur, onFocus } = functions || {};
@@ -36,8 +41,13 @@ const FieldEmail = ({
     setValue(e.target.value);
   };
   useEffect(() => {
-    typeof onChange === "function" && onChange({ value, valid: isEmail(value) });
-    typeof reportChange === "function" && reportChange({ key: "email", value: value, validate: isEmail(value) });
+    typeof onChange === "function" && onChange({ value, valid: isStrongPassword(value) });
+    typeof reportChange === "function" &&
+      reportChange({
+        key: "password",
+        value: value,
+        validate: isStrongPassword(value, { returnScore: (s) => s }),
+      });
   }, [value]);
   //          **************        //
 
@@ -47,13 +57,13 @@ const FieldEmail = ({
   };
   const handleBlur = (e) => {
     // Recomanded to set 'onBlur' function as handler for toggling the 'displayAlerts' param on and off
-    typeof onBlur === "function" && onBlur({ event: e, valid: isEmail(value) });
+    typeof onBlur === "function" && onBlur({ event: e, valid: isStrongPassword(value) });
   };
   //          **************        //
 
   //          ALERTS HANDLING
   useEffect(() => {
-    displayAlerts && isEmail(value) === false
+    displayAlerts && isStrongPassword(value) === false
       ? setAlertsToDisplay(
           <Alert
             {...AlertProps}
@@ -77,7 +87,7 @@ const FieldEmail = ({
       <TextField
         aria-label='email field'
         value={value}
-        type={"email"}
+        type={"password"}
         {...{ label, placeholder, name, ...rest }}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -95,7 +105,7 @@ const FieldEmail = ({
   );
 };
 
-FieldEmail.propTypes = {
+FieldPassword2.propTypes = {
   functions: PropTypes.shape({
     onChange: PropTypes.func,
     onBlur: PropTypes.func,
@@ -122,8 +132,8 @@ FieldEmail.propTypes = {
   BoxProps: PropTypes.object,
   AlertProps: PropTypes.object,
 };
-FieldEmail.defaultProps = {
+FieldPassword2.defaultProps = {
   defaultValue: "",
 };
 
-export default FieldEmail;
+export default FieldPassword2;
