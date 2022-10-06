@@ -10,23 +10,26 @@ import * as types from "./utils/vars";
 import * as validations from "./utils/validations";
 
 const Form = (props) => {
-  const { onSubmit, validationTerms, children } = props;
+  const { onSubmit, validationTerms, disableCard, variant, children, name } = props;
 
   const [state, dispatch] = useReducer(reducer, initialState());
 
-  function assignFieldValue({name, value, type}) {
-    const valid = validations.checkByType({ type, value, options: validationTerms[name] });
+  function assignFieldValue({ name, value, type }) {
+    const valid = validations.checkByType({
+      type,
+      value,
+      options: validationTerms[name],
+    });
     dispatch({
       type: types.ASSIGN_FIELD,
       payload: {
         key: name,
         value: value,
-        validate: () =>
-          valid,
+        validate: () => valid,
       },
     });
 
-    return valid
+    return valid;
   }
 
   function handleSubmit() {
@@ -49,20 +52,38 @@ const Form = (props) => {
         displayAlerts: state.displayAlerts,
         onChange: assignFieldValue,
         onSubmit: handleSubmit,
+        variant,
+        name,
       }}
     >
-      <Card component={"form"}>{children}</Card>
+      {disableCard ? children : <Card component={"form"}>{children}</Card>}
     </Context.Provider>
   );
 };
 
-Form.propTypes = {};
+Form.propTypes = {
+  variant: PropTypes.oneOf(["filled", "outlined", "standard"]),
+  onSubmit: PropTypes.func,
+  validationTerms: PropTypes.shape({
+    password: PropTypes.shape({
+      minLength: PropTypes.number,
+      minLowercase: PropTypes.number,
+      minNumbers: PropTypes.number,
+      minSymbols: PropTypes.number,
+      minUppercase: PropTypes.number,
+      minScroe: PropTypes.number,
+    }),
+  }),
+  disableCard: PropTypes.bool,
+  name: PropTypes.string,
+};
 Form.defaultProps = {
   validationTerms: {
     password: {
-      minLength: 3,
+      minLength: 5,
     },
   },
+  name: "form",
 };
 
 export default Form;
