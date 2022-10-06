@@ -11,47 +11,45 @@ import { FormattedMessage } from "react-intl";
 
 const Alert = loadabale(() => import("@mui/material/Alert"));
 
-const FormField = (props) => {
-  const {
-    BoxProps,
-    InputProps,
-    type = "text",
-    name,
-    id,
-    variant,
-    label,
-    placeholder,
-    alertMessegeId,
-    alertMessegeDescription,
-    sx,
-  } = props || {};
+const FormField = ({ ...props }) => {
+  const { alert, BoxProps, name, ...rest } = props || {};
+  const { variant, sx, type, } = rest;
   const context = useFormContext();
-  const { onChange, displayAlerts } = context;
+  const { onChange, displayAlerts, variant: contextVariant, name: prefix } = context;
+  const {
+    id: messegeId,
+    description: alertDescription,
+    defaultMessege: alertDefaultMessege,
+  } = alert;
+
   const [isValid, setIsValid] = useState(false);
+  const [fieldName, setFieldName] = useState(`${prefix}_${name}_field`);
 
   return (
-    <Box display={"flex"} {...BoxProps}>
+    <Box flexWrap={"wrap"} display={"flex"} {...BoxProps}>
       <TextField
-        {...props}
+        variant={variant || contextVariant}
+        name={fieldName}
         sx={{
           flexGrow: 1,
+          "& ::before": {
+            // borderBottom: "none!important",
+          },
           ...sx,
         }}
-        type={type}
         onChange={(e) =>
-          onChange({ name: e.target.name, value: e.target.value, type })
+          onChange({ name: name, value: e.target.value, type })
             ? setIsValid(true)
             : setIsValid(false)
         }
+        {...rest}
       />
-      {displayAlerts && !isValid && (
-        <Alert severity='error'>
+      {alert && displayAlerts && !isValid && (
+        <Alert severity='error' sx={{ flexBasis: "100%" }}>
           <FormattedMessage
-            id={alertMessegeId || "invalid_password"}
-            description={
-              alertMessegeDescription || "password is not strong/long enough etc.."
-            }
-            defaultMessage={"The field above need to be fixed"}
+            id={messegeId}
+            description={alertDescription || "anounce an error in the field"}
+            defaultMessage={alertDefaultMessege || "The field above need to be fixed"}
           />
         </Alert>
       )}
@@ -59,9 +57,26 @@ const FormField = (props) => {
   );
 };
 
-FormField.propTypes = {};
+FormField.propTypes = {
+  label: PropTypes.string,
+  id: PropTypes.string,
+  name: PropTypes.string,
+  placeholder: PropTypes.string,
+  type: PropTypes.oneOf(["text", "email", "number", "password", "tel", "url"]),
+  variant: PropTypes.oneOf(["filled", "outlined", "standard"]),
+  underline: PropTypes.bool,
+  alert: PropTypes.shape({
+    id: PropTypes.string,
+    description: PropTypes.string,
+    defaultMessege: PropTypes.string,
+  }),
+  BoxProps: PropTypes.object,
+  InputProps: PropTypes.object,
+};
 FormField.defaultProps = {
   name: "password",
+  type: "text",
+  alert: {},
 };
 
 export default FormField;
