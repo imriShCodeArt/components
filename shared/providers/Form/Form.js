@@ -14,16 +14,16 @@ const Form = (props) => {
 
   const [state, dispatch] = useReducer(reducer, initialState());
 
-  function assignFieldValue({ name, value, type }) {
+  function assignFieldValue({ name: tmpName, value, type }) {
     const valid = validations.checkByType({
       type,
       value,
-      options: validationTerms[name],
+      options: validationTerms[tmpName],
     });
     dispatch({
       type: types.ASSIGN_FIELD,
       payload: {
-        key: name,
+        key: tmpName,
         value: value,
         validate: () => valid,
       },
@@ -33,6 +33,7 @@ const Form = (props) => {
   }
 
   function handleSubmit() {
+    let tmp = {};
     const allFieldsAreValid =
       Object.keys(state.fields)
         .map((f) => {
@@ -41,9 +42,10 @@ const Form = (props) => {
         .filter((f) => !f).length === 0
         ? true
         : false;
-    allFieldsAreValid
-      ? onSubmit(Object.keys(state.fields).map((f) => state.fields[f][0]))
-      : dispatch({ type: types.TOGGLE_ALERTS_ON });
+    Object.keys(state.fields).forEach((element) => {
+      tmp[element] = state.fields[element][0];
+    });
+    allFieldsAreValid ? onSubmit(tmp) : dispatch({ type: types.TOGGLE_ALERTS_ON });
   }
 
   return (
