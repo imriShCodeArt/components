@@ -104,6 +104,7 @@ module.exports = {
         "./surfaces/Card": "./shared/surfaces/Card",
         "./surfaces/Collapse": "./shared/surfaces/Collapse",
         "./providers/Form": "./shared/providers/Form",
+        "./providers/Menu": "./shared/providers/Menu",
       },
       shared: {
         ...deps,
