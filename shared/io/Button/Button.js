@@ -3,39 +3,45 @@ import PropTypes from "prop-types";
 
 import Root from "@mui/material/Button";
 import { useFormContext } from "shared/providers/Form";
+import { useMenuContext } from "shared/providers/Menu";
 
-function Button({
-  color,
-  variant,
-  onClick,
-  id,
-  controls,
-  text,
-  children,
-  open,
-  contained,
-  outlined,
-  secondary,
-  primary,
-  title,
-  inherit,
-  info,
-  warning,
-  success,
-  ...rest
-}) {
-  const context = useFormContext();
-  const { onSubmit } = context;
+function Button(props) {
+  const {
+    color,
+    variant,
+    onClick,
+    id,
+    text,
+    children,
+    contained,
+    outlined,
+    secondary,
+    inherit,
+    info,
+    warning,
+    success,
+    ...rest
+  } = props || {};
+  const formContext = useFormContext();
+  const { onSubmit } = formContext || {};
+  const menuContext = useMenuContext() || {};
+  const { handleOpen: handleMenuOpen, name: menuID, open: MenuOpen } = menuContext;
+
+  const handleClick = (e) => {
+    typeof onClick === "function" && onClick(e);
+    typeof onSubmit === "function" && onSubmit(e);
+    typeof handleMenuOpen === "function" && handleMenuOpen(e);
+  };
+
   return (
     <Root
-      aria-controls={controls}
-      aria-haspopup={controls ? "true" : undefined}
-      aria-expanded={open ? "true" : undefined}
+      id={menuID ? `${menuID + "_" || ""}${id || "button"}` : id}
+      aria-controls={menuID}
+      aria-haspopup={menuID ? "true" : undefined}
+      aria-expanded={MenuOpen ? "true" : undefined}
       variant={contained ? "contained" : outlined ? "outlined" : variant}
       color={
-        primary
-          ? "primary"
-          : secondary
+        secondary
           ? "secondary"
           : inherit
           ? "inherit"
@@ -47,8 +53,8 @@ function Button({
           ? "success"
           : color
       }
-      {...{ id, title, ...rest }}
-      onClick={onSubmit || onClick}
+      {...rest}
+      onClick={handleClick}
     >
       {children || text}
     </Root>
@@ -57,7 +63,7 @@ function Button({
 
 Button.propTypes = {
   text: PropTypes.string,
-  children: PropTypes.string,
+  children: PropTypes.any,
   variant: PropTypes.oneOf(["text", "contained", "outlined"]),
   onClick: PropTypes.func,
   id: PropTypes.string,
