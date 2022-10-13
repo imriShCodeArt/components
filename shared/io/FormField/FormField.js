@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import loadabale from "@loadable/component";
 
@@ -22,8 +22,12 @@ const FormField = ({ ...props }) => {
     defaultMessege: alertDefaultMessege,
   } = alert;
 
-  const [isValid, setIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(true);
   const [fieldName, setFieldName] = useState(`${prefix}_${name}_field`);
+
+  useEffect(() => {
+    onChange && onChange({ name: name, value: undefined, type })
+  }, [])
 
   return (
     <Box flexWrap={"wrap"} display={"flex"} {...BoxProps}>
@@ -74,7 +78,6 @@ FormField.propTypes = {
   InputProps: PropTypes.object,
 };
 FormField.defaultProps = {
-  name: "password",
   type: "text",
   alert: {},
 };
