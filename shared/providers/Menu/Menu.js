@@ -5,7 +5,18 @@ import Context from "./Context";
 import Root from "@mui/material/Menu";
 
 const Menu = (props) => {
-  const { children, defaultOpen, name, root: rootElement } = props;
+  const {
+    children,
+    defaultOpen,
+    name,
+    root: rootElement,
+    sx,
+    horizontal='left',
+    vertical='bottom',
+    bottom,
+    top,
+    ...rest
+  } = props;
   const [open, setOpen] = useState(defaultOpen !== undefined);
   const [anchorElement, setAnchorElement] = useState(null);
   const [labelledby, setLabelledby] = useState("");
@@ -21,15 +32,24 @@ const Menu = (props) => {
   };
   return (
     <Context.Provider value={{ open, handleOpen, name }}>
-      {rootElement}
+      {{ ...rootElement, props: { ...rootElement.props, onClick: handleOpen } }}
       <Root
+        anchorOrigin={{
+          vertical,
+          horizontal,
+        }}
         id={name}
         anchorEl={anchorElement}
         open={open}
         onClose={handleClose}
         MenuListProps={{
           "aria-labelledby": labelledby,
+          sx,
         }}
+        PaperProps={{
+          sx: { bottom, top },
+        }}
+        {...rest}
       >
         {children}
       </Root>
