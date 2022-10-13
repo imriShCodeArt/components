@@ -34,7 +34,7 @@ function Button(props) {
   };
 
   return (
-    <Root
+    <Root 
       id={menuID ? `${menuID + "_" || ""}${id || "button"}` : id}
       aria-controls={menuID}
       aria-haspopup={menuID ? "true" : undefined}
@@ -62,7 +62,7 @@ function Button(props) {
 }
 
 Button.propTypes = {
-  text: PropTypes.string,
+  text: PropTypes.any,
   children: PropTypes.any,
   variant: PropTypes.oneOf(["text", "contained", "outlined"]),
   onClick: PropTypes.func,
