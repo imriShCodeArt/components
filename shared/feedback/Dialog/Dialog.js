@@ -76,7 +76,7 @@ Dialog.propTypes = {
   open: PropTypes.bool,
   onClose: PropTypes.func,
   title: PropTypes.string,
-  actions: PropTypes.arrayOf(PropTypes.element),
+  actions: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]),
   transitionDirection: PropTypes.oneOf(["up", "right", "down", "left"]).isRequired,
   transitionElement: PropTypes.element,
 };
