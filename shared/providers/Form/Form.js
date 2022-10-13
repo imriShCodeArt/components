@@ -48,6 +48,12 @@ const Form = (props) => {
     allFieldsAreValid ? onSubmit(tmp) : dispatch({ type: types.TOGGLE_ALERTS_ON });
   }
 
+  useEffect(() => {
+    window.addEventListener('keypress', e=>{
+      e.key === 'Enter' && handleSubmit()
+    })
+  }, [])
+
   return (
     <Context.Provider
       value={{
@@ -81,9 +87,7 @@ Form.propTypes = {
 };
 Form.defaultProps = {
   validationTerms: {
-    password: {
-      minLength: 5,
-    },
+    password: {},
   },
   name: "form",
 };
